@@ -15,7 +15,7 @@
 <p align="center"><em>Um script para gerenciamento de contas e suas senhas com persistência em máquina, evitando vulnerabilidades da nuvem.</em></p>
 
 ### 🎯 Sobre o Projeto
-O PassManager foi criado para resolver dois problemas comuns: o esquecimento de senhas e a dependência de gerenciadores que salvam seus dados na nuvem. Inspirado em ferramentas de linha de comando como `npm` e `pip`, este projeto oferece uma interface rápida e segura diretamente no seu terminal, eliminando a necessidade de qualquer interface gráfica. Toda a informação é salva localmente, garantindo que você tenha controle total sobre seus dados.
+O PassManager nasceu de uma necessidade pessoal de resolver dois problemas comuns: o esquecimento de senhas e a dependência de gerenciadores que salvam seus dados na nuvem. Inspirado em ferramentas de linha de comando como `npm` e `pip`, este projeto oferece uma interface rápida e segura diretamente no seu terminal, eliminando a necessidade de qualquer interface gráfica. Toda a informação é salva localmente, garantindo que você tenha controle total sobre seus dados.
 
 ### ✨ Funcionalidades
 - **🔐 Gerenciamento de Contas:** Adicione e organize múltiplas contas (ex: e-mails).
@@ -43,7 +43,7 @@ O PassManager foi criado para resolver dois problemas comuns: o esquecimento de 
 <p align="center"><em>A script for managing accounts and their passwords with local persistence, avoiding cloud-based vulnerabilities.</em></p>
 
 ### 🎯 About The Project
-PassManager was created to solve two common problems: forgetting passwords and relying on managers that save your data in the cloud. Inspired by command-line tools like `npm` and `pip`, this project provides a fast and secure interface directly in your terminal, eliminating the need for a graphical interface. All information is saved locally, ensuring you have full control over your data.
+PassManager was born out of a personal need to solve two common problems: forgetting passwords and relying on managers that save your data in the cloud. Inspired by command-line tools like `npm` and `pip`, this project provides a fast and secure interface directly in your terminal, eliminating the need for a graphical interface. All information is saved locally, ensuring you have full control over your data.
 
 ### ✨ Features
 - **🔐 Account Management:** Add and organize multiple accounts (e.g., emails).
