@@ -11,7 +11,7 @@
 <a name="versão-em-português-pt-br"></a>
 ## 🇧🇷 Versão em Português (PT-BR)
 
-<h1 align="center">PassManager</h1>
+<h1 align="center">MyPass</h1>
 <p align="center"><em>Um script para gerenciamento de contas e suas senhas com persistência em máquina, evitando vulnerabilidades da nuvem.</em></p>
 
 ### 🎯 Sobre o Projeto
@@ -39,7 +39,7 @@ O PassManager nasceu de uma necessidade pessoal de resolver dois problemas comun
 <a name="english-version-en-us"></a>
 ## 🇺🇸 English Version (EN-US)
 
-<h1 align="center">PassManager</h1>
+<h1 align="center">MyPass</h1>
 <p align="center"><em>A script for managing accounts and their passwords with local persistence, avoiding cloud-based vulnerabilities.</em></p>
 
 ### 🎯 About The Project
