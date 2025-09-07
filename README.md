@@ -17,6 +17,8 @@
 ### 🎯 Sobre o Projeto
 O MyPass nasceu de uma necessidade pessoal de resolver dois problemas comuns: o esquecimento de senhas e a dependência de gerenciadores que salvam seus dados na nuvem. Inspirado em ferramentas de linha de comando como `npm` e `pip`, este projeto oferece uma interface rápida e segura diretamente no seu terminal, eliminando a necessidade de qualquer interface gráfica. Toda a informação é salva localmente, garantindo que você tenha controle total sobre seus dados.
 
+**VEJA AS ATUALIZAÇÕES NA BRANCH --DEVELOP--**
+
 ### ✨ Funcionalidades
 - **🔐 Gerenciamento de Contas:** Adicione e organize múltiplas contas (ex: e-mails).
 - **🔑 Múltiplas Senhas por Conta:** Associe senhas de diferentes serviços (Google, GitHub, etc.) a uma única conta.
