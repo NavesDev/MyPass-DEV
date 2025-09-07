@@ -150,6 +150,7 @@ def account(
     name:Annotated[Optional[str],typer.Option("--name","-n", help=manager.getWord("cmd_desc_edit_account_name"))] = None,
     email:Annotated[Optional[str],typer.Option("--email","-e", help=manager.getWord("cmd_desc_edit_account_email"))] = None
 ):    
+    # EDITAR ISSO DEPOIS
     try:
         database = sqlite3.connect("data/user.db")
         cursor = database.cursor()
