@@ -26,7 +26,10 @@ langsBook = {
     "cmd_desc_add_account": "Adiciona uma nova conta a aplicação.",
     "cmd_desc_add_account_email": "Adiciona um email a conta que está sendo criada",
     "cmd_desc_edit_service": "edit service [--service] <serviço> [--id <id>] [--password <senha>]\n  Edita um serviço e seus dados da conta ativa.",
-    "cmd_desc_edit_account": "edit account\n  Edita uma conta e seus dados.",
+    "cmd_desc_edit_account": "Edita uma conta e seus dados.",
+    "cmd_desc_edit_account_idname":"O ID ou nome da conta a ser buscada",
+    "cmd_desc_edit_account_name":"Novo nome da conta (Opcional)",
+    "cmd_desc_edit_account_email":"Novo email da conta (Opcional)",
     # Comandos de Deleção (PERIGOSOS!)
     "cmd_desc_delete_service": "delete service --service <serviço> ou --id <id>\n  Deleta um serviço específico da conta ativa.", # NOVO
     "cmd_desc_delete_account": "delete account <conta>\n  DELETA PERMANENTEMENTE uma conta e todas as senhas nela. (CUIDADO!)", # NOVO
