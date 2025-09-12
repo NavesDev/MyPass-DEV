@@ -5,30 +5,8 @@ from rich.console import Console;
 from rich.table import Table;
 console = Console()
 from script.langs import manager;
-os.makedirs("data",exist_ok=True)
-database = sqlite3.connect("data/user.db")
-cursor = database.cursor()
-cursor.execute("PRAGMA foreign_keys = ON;")
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS Accounts(
-    id integer primary key AUTOINCREMENT,            
-    email text,
-    name text default '<unknown>'
-);
+from script.funcs import db;
 
-""")
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS Services(
-    id integer primary key AUTOINCREMENT,
-    accountId integer not null ,           
-    service text default '<default-service>',
-    password text not null,
-    FOREIGN KEY (accountId) REFERENCES Accounts(id)
-);
-""")
-
-database.commit()
-database.close()
 
 app = typer.Typer(help = manager.getWord('header'))
 add_app = typer.Typer(help = "ADD METHOD")
@@ -38,41 +16,19 @@ app.add_typer(add_app,name='add')
 app.add_typer(list_app,name='list')
 app.add_typer(edit_app,name='edit')
 
-@app.callback()
-def main(
-    ajuda: Annotated[
-        Optional[bool],
-        typer.Option(
-            "--help", "-h",
-            help="Mostra este manual de ajuda super personalizado e sai.",
-           
-            callback=lambda valor: manager.getHelpMenu() if valor else None,
-            is_eager=True 
-        )
-    ] = None,
-):
-    pass
-
-
-@app.command()
-def help(
-    page:Annotated[int,typer.Option("--page",'-p')] = 1
-):
-    console.print(manager.getWord("header"), justify="center")
-    console.print(manager.getHelpMenu(page))
-
 @app.command()
 def version():
     console.print(manager.getWord("header"))
 
+# ROTA PARA ADICIONAR NOVA CONTA NO SISTEMA
 @add_app.command()
 def account(
     name:Annotated[str,typer.Argument(help=manager.getWord("cmd_desc_add_account"))],
     email:Annotated[Optional[str],typer.Option("--email","-e", help=manager.getWord("cmd_desc_add_account_email"))] = None
 ):    
     try:
-        database = sqlite3.connect("data/user.db")
-        cursor = database.cursor()
+        db.load()
+        cursor = db.database.cursor()
         cursor.execute("SELECT id FROM Accounts WHERE name=?",(name,))
         valid = cursor.fetchall()
         if(len(valid)>0):
@@ -84,6 +40,7 @@ def account(
             if(choose=='n'):
                 return
         cursor.execute("INSERT INTO Accounts(email,name) VALUES(?,?)",(email,name))
+  
         message = manager.getWord("success_account_create").format(account=name,email=email or manager.getWord("no_email"))
         console.print(message,highlight=False)
         
@@ -91,15 +48,15 @@ def account(
         print(ex)
         console.print(manager.getWord("error_general"))
     finally:
-        if(database):
-            database.commit()
-            database.close()
-    
+        cursor.close()
+        db.close()
+
+# ROTA PARA LISTAR AS CONTAS DO SISTEMA
 @list_app.command()
 def account(
     page : Annotated[
         Optional[int],
-        typer.Option('--page','-p',help='')
+        typer.Option('--page','-p',help=manager.getWord("cmd_desc_edit_account_page"))
         ] = 1,
     
 ):    
@@ -144,37 +101,39 @@ def account(
             database.commit()
             database.close()
 
+# COMANDO PARA EDITAR CONTAS DO SISTEMA
 @edit_app.command()
 def account(
-    ID_OR_NAME:Annotated[str,typer.Argument(help=manager.getWord("cmd_desc_edit_account_idname"))],
+    identifier:Annotated[str,typer.Argument(help=manager.getWord("cmd_desc_edit_account_idname"))],
     name:Annotated[Optional[str],typer.Option("--name","-n", help=manager.getWord("cmd_desc_edit_account_name"))] = None,
     email:Annotated[Optional[str],typer.Option("--email","-e", help=manager.getWord("cmd_desc_edit_account_email"))] = None
 ):    
     # EDITAR ISSO DEPOIS
+    # if(not email and not name):
+    #     console.print(manager.getWord("error_no_edit_data"),highlight=False)
+    #     return
     try:
-        database = sqlite3.connect("data/user.db")
-        cursor = database.cursor()
-        cursor.execute("SELECT id FROM Accounts WHERE name=?",(name,))
-        valid = cursor.fetchall()
-        if(len(valid)>0):
-            choose = ''
-            while choose!='n' and choose!='y':
-                console.print(manager.getWord('double_account'))
-                choose = input().strip()
-                choose = choose.lower()
-            if(choose=='n'):
-                return
-        cursor.execute("INSERT INTO Accounts(email,name) VALUES(?,?)",(email,name))
-        message = manager.getWord("success_account_create").format(account=name,email=email or manager.getWord("no_email"))
-        console.print(message,highlight=False)
+        # database = sqlite3.connect("data/user.db")
+        # cursor = database.cursor()
+        # cursor.execute("SELECT id,name,email FROM Accounts WHERE id=? or name=? or email=? ORDER BY CASE WHEN id=? THEN 1 WHEN name=? THEN 2 WHEN email=? THEN 3 END; ",
+        # (identifier,identifier,identifier,identifier,identifier,identifier))
+        # valid = cursor.fetchall()
+        selected = db.search("SELECT id,name,email FROM Accounts WHERE id=? or name=? or email=? ORDER BY CASE WHEN id=? THEN 1 WHEN name=? THEN 2 WHEN email=? THEN 3 END; ",
+                  (identifier,identifier,identifier,identifier,identifier,identifier),identifier)
+        if(db):
         
+            newlist = list(selected)
+            newlist[1] = name if name else newlist[1]
+            newlist[2] = email if email else newlist[2]
+            word = manager.getWord("generic_edit_quest").format(
+                last_data=selected,
+                new_data = newlist
+            )
+            console.print(word,highlight=False)
     except Exception as ex:
-        print(ex)
         console.print(manager.getWord("error_general"))
-    finally:
-        if(database):
-            database.commit()
-            database.close()
+        raise ex
+    
     
 if __name__ == "__main__":
     app()

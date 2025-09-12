@@ -27,9 +27,12 @@ langsBook = {
     "cmd_desc_add_account_email": "Adiciona um email a conta que está sendo criada",
     "cmd_desc_edit_service": "edit service [--service] <serviço> [--id <id>] [--password <senha>]\n  Edita um serviço e seus dados da conta ativa.",
     "cmd_desc_edit_account": "Edita uma conta e seus dados.",
-    "cmd_desc_edit_account_idname":"O ID ou nome da conta a ser buscada",
+    "generic_edit_quest":"[bold]Deseja prosseguir com as alterações?[/bold]\n[grey54]{last_data}[/grey54] ➡️  {new_data}",
+    "cmd_desc_edit_account_page": "Define a página da lista.",
+    "cmd_desc_edit_account_idname":"O parâmetro de identificação da conta a ser buscada",
     "cmd_desc_edit_account_name":"Novo nome da conta (Opcional)",
     "cmd_desc_edit_account_email":"Novo email da conta (Opcional)",
+    "cmd_desc_edit_account_more_than_one":"[khaki1]👥 Mais de um item encontrado pela busca![/khaki1]\nDeseja prosseguir com [bold]{first_item}[/bold] ?\n(y) Sim; (n) Não",
     # Comandos de Deleção (PERIGOSOS!)
     "cmd_desc_delete_service": "delete service --service <serviço> ou --id <id>\n  Deleta um serviço específico da conta ativa.", # NOVO
     "cmd_desc_delete_account": "delete account <conta>\n  DELETA PERMANENTEMENTE uma conta e todas as senhas nela. (CUIDADO!)", # NOVO
@@ -41,13 +44,20 @@ langsBook = {
     "success_account_create": "✅ Usuário criado com succeso:[bold] {account}, {email}[/bold]",
     "success_context_set": "✅ Contexto definido para: {account}",
     "error_general": "[bold red]❌ Erro: Erro inesperado[/bold red]",
-    "double_account":"[red]Já existe uma conta com esse nome! Deseja continuar?[/red]\n(y) Sim; (n) Não",
+    "error_no_edit_data": "[bold red]❌ Erro: Não há nenhuma edição para ser feita! [/bold red]\nUtilize [grey54]<edit account --help>[/grey54] para saber mais",
+    "double_account":"[khaki1]Já existe uma conta com esse nome! Deseja continuar?[/khaki1]\n(y) Sim; (n) Não",
+    "success_search":"✅ Item selecionado com sucesso: [bold]{item}[/bold]",
+    "error_search":"[bold red]❌ Erro: nehum item encontrado por [/bold red]<{num_item}>",
     # Constantes
     "no_email":"[bold gold1]<sem email registrado>[/bold gold1]",
     "id_word":"Id",
+    'search_list':"Lista de itens",
+    'search_quest':"Insira o número do item requisitado",
     'name_word':"Conta",
-    'email_word':"Email"
-}
+    'email_word':"Email",
+    "search_id":"Item",
+    'search_data':"Dados do item"
+    }
 }
 
 class langManager:
