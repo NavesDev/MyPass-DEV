@@ -5,7 +5,7 @@ from rich.console import Console;
 from rich.table import Table;
 console = Console()
 from script.langs import manager;
-from script.funcs import db;
+from script.funcs import db,forceInput;
 
 
 app = typer.Typer(help = manager.getWord('header'))
@@ -32,11 +32,7 @@ def account(
         cursor.execute("SELECT id FROM Accounts WHERE name=?",(name,))
         valid = cursor.fetchall()
         if(len(valid)>0):
-            choose = ''
-            while choose!='n' and choose!='y':
-                console.print(manager.getWord('double_account'))
-                choose = input().strip()
-                choose = choose.lower()
+            choose = forceInput(manager.getWord('double_account'),['n','y'])
             if(choose=='n'):
                 return
         cursor.execute("INSERT INTO Accounts(email,name) VALUES(?,?)",(email,name))
@@ -91,7 +87,7 @@ def account(
         output.add_column(manager.getWord("name_word").upper(), style="white")
         output.add_column(manager.getWord("email_word").upper(), style="white")
         for line in data:
-            output.add_row(str(line[0]),str(line[1]),str(line[2]))
+            output.add_row(str(line[0]),str(line[1]),str(line[2] if line[2] else manager.getWord("notFoundEmail")))
         console.print(output,highlight=False) 
     except Exception as ex:
         print(ex)
@@ -108,10 +104,11 @@ def account(
     name:Annotated[Optional[str],typer.Option("--name","-n", help=manager.getWord("cmd_desc_edit_account_name"))] = None,
     email:Annotated[Optional[str],typer.Option("--email","-e", help=manager.getWord("cmd_desc_edit_account_email"))] = None
 ):    
+    cursor = None
     # EDITAR ISSO DEPOIS
-    # if(not email and not name):
-    #     console.print(manager.getWord("error_no_edit_data"),highlight=False)
-    #     return
+    if(not email and not name):
+         console.print(manager.getWord("error_no_edit_data"),highlight=False)
+         return
     try:
         # database = sqlite3.connect("data/user.db")
         # cursor = database.cursor()
@@ -123,16 +120,29 @@ def account(
         if(db):
         
             newlist = list(selected)
+            edits = {}
+        
             newlist[1] = name if name else newlist[1]
             newlist[2] = email if email else newlist[2]
             word = manager.getWord("generic_edit_quest").format(
-                last_data=selected,
-                new_data = newlist
+                last_data=f"({', '.join([str(i) for i in selected])})",
+                new_data = f"({', '.join([str(i) for i in newlist])})"
             )
-            console.print(word,highlight=False)
+          
+            choose = forceInput(word,['y','n'])
+            if(choose == 'y'):
+                cursor = db.database.cursor()
+                cursor.execute(f'UPDATE Accounts SET name = ? , email = ? WHERE id = ?',(newlist[1],newlist[2],newlist[0]))
+                word = manager.getWord("success_edit")
+                console.print(word)
+                
     except Exception as ex:
         console.print(manager.getWord("error_general"))
         raise ex
+    finally:
+        if(cursor):
+            cursor.close()
+        db.close()
     
     
 if __name__ == "__main__":

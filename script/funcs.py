@@ -53,6 +53,7 @@ class _Db():
             raise Exception("DB close failure")
         
     def search(self,query:str, queryParams,paramID = None):
+        cursor = None
         try:
             ## FAZENDO A BUSCA
             if(not self.database):
@@ -121,6 +122,16 @@ class _Db():
         except Exception as ex:
             print(ex)
             raise Exception("Search failure") from ex
+        finally:
+            if(cursor):
+                cursor.close()
           
         
 db = _Db()
+
+def forceInput(text:str,responses:list[str]):
+    choose = None
+    while choose not in responses:
+        console.print(text,highlight=False)
+        choose = input().strip()
+    return choose

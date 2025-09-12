@@ -27,7 +27,7 @@ langsBook = {
     "cmd_desc_add_account_email": "Adiciona um email a conta que está sendo criada",
     "cmd_desc_edit_service": "edit service [--service] <serviço> [--id <id>] [--password <senha>]\n  Edita um serviço e seus dados da conta ativa.",
     "cmd_desc_edit_account": "Edita uma conta e seus dados.",
-    "generic_edit_quest":"[bold]Deseja prosseguir com as alterações?[/bold]\n[grey54]{last_data}[/grey54] ➡️  {new_data}",
+    "generic_edit_quest":"[bold]Deseja prosseguir com as alterações?[/bold]\n[grey54]{last_data}[/grey54] ➡️  {new_data}\n(y) Sim; (n) Não",
     "cmd_desc_edit_account_page": "Define a página da lista.",
     "cmd_desc_edit_account_idname":"O parâmetro de identificação da conta a ser buscada",
     "cmd_desc_edit_account_name":"Novo nome da conta (Opcional)",
@@ -46,7 +46,8 @@ langsBook = {
     "error_general": "[bold red]❌ Erro: Erro inesperado[/bold red]",
     "error_no_edit_data": "[bold red]❌ Erro: Não há nenhuma edição para ser feita! [/bold red]\nUtilize [grey54]<edit account --help>[/grey54] para saber mais",
     "double_account":"[khaki1]Já existe uma conta com esse nome! Deseja continuar?[/khaki1]\n(y) Sim; (n) Não",
-    "success_search":"✅ Item selecionado com sucesso: [bold]{item}[/bold]",
+    "success_edit":"[bold green]✅ Alterações feitas com sucesso[/bold green]",
+    "success_search":"✅ Item selecionado com sucesso: [bold]{item}[/bold]\n",
     "error_search":"[bold red]❌ Erro: nehum item encontrado por [/bold red]<{num_item}>",
     # Constantes
     "no_email":"[bold gold1]<sem email registrado>[/bold gold1]",
@@ -56,7 +57,8 @@ langsBook = {
     'name_word':"Conta",
     'email_word':"Email",
     "search_id":"Item",
-    'search_data':"Dados do item"
+    'search_data':"Dados do item",
+    "notFoundEmail":"[khaki1]NÃO REGISTRADO[/khaki1]"
     }
 }
 
