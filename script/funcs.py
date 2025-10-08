@@ -1,17 +1,59 @@
-import sqlite3,os,rich;
+import sqlite3,os,rich,json,base64,getpass;
 from rich.console import Console;
 from rich.table import Table;
 from script.langs import manager;
+from cryptography.fernet import Fernet;
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.backends import default_backend
+from script.configs import Configs,SecureData;
+from script.constants import SECRET_DIR;
+
+
 console = Console()
 
-class _Db():
-    name = 'user.db'
-    locate = 'data'
-    database=None
+# CÓDIGO PARA CRIPTOGRAFAR DADOS COM BASE EM UMA SENHA MESTRA
+class _Secret:
     def __init__(self):
-        ## Criando instâncias básicas de Banco de dados
+        pass
+    def _kdf(self):
+        return PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32, # O Fernet precisa de uma chave de 32 bytes
+            salt=base64.b64decode(SecureData.salt),
+            iterations=480000,
+            backend=default_backend()
+        )  
+    def encrypt(self,master_password,data_to_crip):
+        # CRIPTOGRAFA OS DADOS COM BASE NA SENHA MESTRA
+        crip_key = base64.urlsafe_b64encode(self._kdf().derive(master_password.encode("utf-8")))
+        fernet = Fernet(crip_key)
+        return fernet.encrypt(data_to_crip.encode("utf-8")).decode()
+    def decrypt(self,master_password:str,encodeKey:str):
+        # DESCRIPTOGRAFA OS DADOS SOMENTE SE HOUVER A SENHA MESTRA
+        try:
+            cripKey = base64.urlsafe_b64encode(self._kdf().derive(master_password.encode("utf-8")))
+            fernet = Fernet(cripKey)
+            return fernet.decrypt(encodeKey.encode()).decode()
+        except Exception as ex:
+
+            console.print(manager.getWord("error_wrong_key"),highlight=False)
+            return False
+            
+Secret = _Secret()
+default_account_name = "UserDefault"
+
+# CLASSE PARA GERÊNCIAR BANCO DE DADOS
+class _Db:
+    name = 'user.db'
+    locate = SECRET_DIR / 'data'
+    database = None
+
+    def __init__(self):
+        ## CRIANDO INSTÂNCIAS BÁSICAS NO BANCO DE DADOS
+
         os.makedirs(self.locate,exist_ok=True)
-        database = sqlite3.connect(f"{self.locate}/{self.name}")
+        database = sqlite3.connect(self.locate / self.name)
         cursor = database.cursor()
         cursor.execute("PRAGMA foreign_keys = ON;")
         cursor.execute("""
@@ -31,12 +73,27 @@ class _Db():
             FOREIGN KEY (accountId) REFERENCES Accounts(id)
         );
         """)
+        if Configs.selected_account == None:
+            cursor.execute(f"""
+                INSERT INTO Accounts(name) VALUES( '{default_account_name}');
+            """) 
+            Configs.massUpdate(selected_account = cursor.lastrowid)
+        
 
         database.commit()
         database.close()
         pass
+    def execute(self,query,query_params = ()):
+        try:
+            self.load()
+            cursor = self.database.cursor()
+            cursor.execute(query,query_params)
+            self.database.commit()
+            return cursor.fetchall()
+        finally:
+            cursor.close()
     def load(self):
-        # LOADING DB ASSETS
+        # CARREGAR E ENTREGAR BANCO DE DADOS
         self.close()
         try:
             self.database = sqlite3.connect(f"{self.locate}/{self.name}")
@@ -46,18 +103,21 @@ class _Db():
     def close(self):
         try:
             if(self.database):
-                self.database.commit()
+                try:
+                    self.database.commit()
+                except:
+                    pass
                 self.database.close()
                 self.database = None
-        except Exception:
-            raise Exception("DB close failure")
+        except Exception as ex:
+            raise ex
         
     def search(self,query:str, queryParams,paramID = None):
-        cursor = None
+    
         try:
             ## FAZENDO A BUSCA
-            if(not self.database):
-                self.load()
+            
+            self.load()
             cursor = self.database.cursor()
             cursor.execute(query,queryParams)
             data = cursor.fetchall()
@@ -78,7 +138,7 @@ class _Db():
                         console.print(word,highlight=False)
                         return data[1]
                     
-                    ## LISTA DE OPÇÕES A SEREM ESCOLHIDAS
+                    ## EMITE UMA LISTA DE OPÇÕES DA BUSCA
                     index = 1
                     output = Table(title=manager.getWord("search_list"),
                         box=rich.box.ROUNDED,
@@ -89,19 +149,19 @@ class _Db():
                         padding=(0,3))
                     output.add_column(manager.getWord("search_id").upper(), style="grey54",justify='center')
                     output.add_column(manager.getWord("search_data").upper(),style='white')
-                    newList = {}
+                    new_list = {}
                     for item in data[1:]:
-                        newList[str(index)] = item
+                        new_list[str(index)] = item
                         output.add_row(str(index),", ".join(str(i) for i in item))
                         index+= 1
                     console.print(output)
                     choose = input()
                     choose = choose.strip()
                     
-                    if(newList.get(choose)):
-                        word = manager.getWord("success_search").format(item= ", ".join(str(item) for item in newList[choose])) 
+                    if(new_list.get(choose)):
+                        word = manager.getWord("success_search").format(item= ", ".join(str(item) for item in new_list[choose])) 
                         console.print(word,highlight=False)
-                        return newList[choose]
+                        return new_list[choose]
                     else:
                         word = manager.getWord("error_search").format(num_item=choose) 
                         console.print(word,highlight=False)
@@ -129,9 +189,43 @@ class _Db():
         
 db = _Db()
 
-def forceInput(text:str,responses:list[str]):
+# CLASSE DE REGRAS DO FORCE INPUT PARA FACILITAR A VISIBILADE
+class FIRules():
+    ## SOMETE PALAVRAS PRÉ SELECIONADAS
+    selected_words = 0
+    ## PALAVRAS COM FILTROS (Ex.: mais de seis letras)
+    filter_word = 1
+    ## SENHA SECRETA
+    
+    ## VALIDAR A PALAVRA, VERIFICANDO SE ELA OBEDECE A TODOS OS FILTROS
+    def checkFilters(word,filters:dict = {}):
+        ### FILTROS
+        #### TAMANHO MÁXIMO DA PALAVRA
+        max_len = filters.get("max_len")
+        if(max_len and len(word)>max_len):
+            return False
+        #### TAMANHO MÍNIMO DA PALAVRA
+        min_len = filters.get("min_len")
+        if(min_len and len(word)<min_len):
+            return False
+        return True
+
+# UM INPUT QUE SÓ PARA QUANDO RECEBE RESPOSTAS ADEQUADAS
+def forceInput(text:str,responses:list[str] = None,rule:int = FIRules.selected_words,**kwargs):
     choose = None
-    while choose not in responses:
-        console.print(text,highlight=False)
-        choose = input().strip()
+    if(rule == FIRules.selected_words):
+        while choose not in responses:
+            console.print(text,highlight=False)
+            choose = input().strip()
+    elif(rule == FIRules.filter_word):
+        valid_word = False
+        while not valid_word:
+            console.print(text,highlight=False)
+            input_type = kwargs.get("input_type")
+            if(input_type and input_type=="password"):
+                choose = getpass.getpass("> ")
+            else:
+                choose = input().strip()
+            if(FIRules.checkFilters(choose,kwargs)):
+                valid_word = True
     return choose

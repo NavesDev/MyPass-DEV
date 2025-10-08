@@ -1,4 +1,4 @@
-defaultLang = "en-us"
-
-def getVersion():
-    return "v1.0"
+from pathlib import Path;
+DEFAULT_LANG = "en-us"
+VERSION = "v1.0"
+SECRET_DIR =  Path.home() / ".mypass_data"
